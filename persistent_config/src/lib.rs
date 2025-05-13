@@ -64,7 +64,9 @@ impl PersistentConfigDB {
         self.map.get(&type_id)
     }
 }
-pub trait PersistentConfig: Sized + Default + PartialEq + Serialize + for<'de> Deserialize<'de> + 'static {
+pub trait PersistentConfigBuilder:
+    Sized + Default + PartialEq + Serialize + for<'de> Deserialize<'de> + 'static
+{
     fn permanent_config(
         &self,
         config_dir: Option<PathBuf>,
@@ -90,7 +92,9 @@ pub trait PersistentConfig: Sized + Default + PartialEq + Serialize + for<'de> D
         PERSISTENT_CONFIGS.write().unwrap().add_config::<Self>(config_params);
         Ok(())
     }
+}
 
+pub trait PersistentConfig: PersistentConfigBuilder {
     fn save(&self) -> Result<()> {
         let ret_val = { PERSISTENT_CONFIGS.read().unwrap().get_config::<Self>().cloned() }; // Cloning to unlock 
         match ret_val {
@@ -139,6 +143,8 @@ pub trait PersistentConfig: Sized + Default + PartialEq + Serialize + for<'de> D
     }
 }
 
+impl<T: PersistentConfigBuilder> PersistentConfig for T {}
+
 #[cfg(test)]
 mod tests {
 
@@ -150,7 +156,7 @@ mod tests {
             field1: String,
             field2: i32,
         }
-        impl PersistentConfig for TestConfig {}
+        impl PersistentConfigBuilder for TestConfig {}
 
         let my_struct = TestConfig::default();
 
@@ -158,10 +164,10 @@ mod tests {
             .permanent_config(None, None, SaveFormat::default(), true)
             .unwrap();
 
+        println!("{:=^100}", " Test Saving ");
         my_struct.save().unwrap();
-        my_struct.load().unwrap();
 
-        println!("Loaded config: {:?}", my_struct);
-        println!("Persistent {:#?}", PERSISTENT_CONFIGS.read().unwrap());
+        println!("{:=^100}", " Test Loading ");
+        my_struct.load().unwrap();
     }
 }
