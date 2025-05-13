@@ -76,7 +76,7 @@ pub trait PersistentConfig: Sized + Default + PartialEq + Serialize + for<'de> D
         // if directory is none use current directory
         // if file name is none use name of entity
 
-        let config_dir = config_dir.unwrap_or_else(|| PathBuf::from("."));
+        let config_dir = config_dir.unwrap_or_else(|| PathBuf::from("./"));
         let file_name = file_name.unwrap_or_else(|| {
             std::any::type_name::<Self>().split("::").last().unwrap().to_owned() + save_format.ext()
         });
