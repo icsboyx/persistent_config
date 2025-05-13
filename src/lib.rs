@@ -40,10 +40,10 @@ pub struct PersistentConfigParameters {
 impl Default for PersistentConfigParameters {
     fn default() -> Self {
         PersistentConfigParameters {
-            config_dir: PathBuf::new(),         // Default empty PathBuf
-            file_name: String::new(),           // Default empty String
+            config_dir: PathBuf::new(),         // Default empty PathBuf, will fall to app directory
+            file_name: String::new(),           // Default empty String, will use type name + format extension
             save_format: SaveFormat::default(), // Default SaveFormat::TOML
-            default_on_error: true,             // Default behavior on error
+            default_on_error: true, // Default behavior on error, if true lib will panic else Struct::default() will be returned with a running in memory message.
         }
     }
 }
