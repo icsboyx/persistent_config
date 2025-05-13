@@ -48,7 +48,7 @@ impl Default for PersistentConfigParameters {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PersistentConfigDB {
     map: HashMap<TypeId, PersistentConfigParameters>,
 }
@@ -92,16 +92,35 @@ pub trait PersistentConfig: Sized + Default + PartialEq + Serialize + for<'de> D
     }
 
     fn save(&self) -> Result<()> {
-        let ret_val = PERSISTENT_CONFIGS.read().unwrap();
-        let Some(params) = ret_val.get_config::<Self>() else {
-            return Err(anyhow::anyhow!("Config not found for type: {}", type_name::<Self>()));
-        };
-        println!("Saving config to: {:?}", params);
+        let ret_val = { PERSISTENT_CONFIGS.read().unwrap().get_config::<Self>().cloned() }; // Cloning to unlock 
+        match ret_val {
+            Some(params) => {
+                println!("Saving config to {:?}", params.config_dir);
+                println!("File name: {:?}", params.file_name);
+                println!("Save format: {:?}", params.save_format);
+                println!("Panic on error: {:?}", params.default_on_error);
+            }
+            None => {
+                return Err(anyhow::anyhow!("No persistent config found for this type"));
+            }
+        }
 
         Ok(())
     }
 
     fn load(&self) -> Result<Self> {
+        let ret_val = { PERSISTENT_CONFIGS.read().unwrap().get_config::<Self>().cloned() }; // Cloning to unlock
+        match ret_val {
+            Some(params) => {
+                println!("Loading config from {:?}", params.config_dir);
+                println!("File name: {:?}", params.file_name);
+                println!("Save format: {:?}", params.save_format);
+                println!("Panic on error: {:?}", params.default_on_error);
+            }
+            None => {
+                return Err(anyhow::anyhow!("No persistent config found for this type"));
+            }
+        }
         println!("Implement load method");
         Ok(Self::default())
     }
@@ -134,17 +153,15 @@ mod tests {
         impl PersistentConfig for TestConfig {}
 
         let my_struct = TestConfig::default();
+
         my_struct
             .permanent_config(None, None, SaveFormat::default(), true)
             .unwrap();
 
-        println!("Saving config: {:#?}", PERSISTENT_CONFIGS);
-
         my_struct.save().unwrap();
-
         my_struct.load().unwrap();
-        println!("Loaded config: {:?}", my_struct);
 
+        println!("Loaded config: {:?}", my_struct);
         println!("Persistent {:#?}", PERSISTENT_CONFIGS.read().unwrap());
     }
 }
