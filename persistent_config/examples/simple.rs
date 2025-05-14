@@ -1,5 +1,5 @@
 use persistent_config::{PersistentConfig, PersistentConfigBuilder, SaveFormat};
-use serde::{Deserialize, Serialize}; // Import your library
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 struct MyConfig {
