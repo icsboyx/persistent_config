@@ -1,17 +1,16 @@
+use persistent_config::persistent_config_macros::Persistent;
 use persistent_config::{PersistentConfig, PersistentConfigBuilder, SaveFormat};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize}; // Import procedural macros
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-struct MyConfig {
-    field1: String,
-    field2: i32,
+#[derive(Serialize, Deserialize, Default, Debug, Persistent)] // Add configuration for Persistent derive
+pub struct MyConfig {
+    pub field1: String,
+    pub field2: i32,
 }
-
-impl PersistentConfigBuilder for MyConfig {}
 
 fn main() {
     let my_config = MyConfig {
-        field1: "Hello".to_string(),
+        field1: "Hello From Derive Example".to_string(),
         field2: 42,
     };
 
@@ -25,10 +24,10 @@ fn main() {
     my_config.load().unwrap();
 
     println!("{:=^100}", " Checking configuration ");
-    println!(
-        "Check if loaded config is equal to default {}",
-        my_config.is_default().unwrap()
-    );
+    // println!(
+    //     "Check if loaded config is equal to default {}",
+    //     my_config.is_default().unwrap()
+    // );
 
     println!("{:=^100}", " Configuration content ");
     println!("Content of the : {:#?}", my_config);

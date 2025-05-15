@@ -4,8 +4,13 @@ use std::path::PathBuf;
 use std::sync::{LazyLock, RwLock};
 
 pub use anyhow::Result;
+#[cfg(feature = "derive")]
+pub extern crate persistent_config_macros;
+#[cfg(feature = "derive")]
+pub use persistent_config_macros::Persistent;
 use serde::{Deserialize, Serialize};
-pub(crate) static PERSISTENT_CONFIGS: LazyLock<RwLock<PersistentConfigDB>> =
+
+pub static PERSISTENT_CONFIGS: LazyLock<RwLock<PersistentConfigDB>> =
     LazyLock::new(|| RwLock::new(PersistentConfigDB::default()));
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -63,9 +68,7 @@ impl PersistentConfigDB {
         self.map.get(&type_id)
     }
 }
-pub trait PersistentConfigBuilder:
-    Sized + Default + PartialEq + Serialize + for<'de> Deserialize<'de> + 'static
-{
+pub trait PersistentConfigBuilder: Sized + Default + Serialize + for<'de> Deserialize<'de> + 'static {
     fn permanent_config(
         &self,
         config_dir: Option<PathBuf>,
@@ -107,6 +110,7 @@ pub trait PersistentConfig: PersistentConfigBuilder {
                 return Err(anyhow::anyhow!("No persistent config found for this type"));
             }
         }
+        // TODO: Implement save method
 
         Ok(())
     }
@@ -125,21 +129,23 @@ pub trait PersistentConfig: PersistentConfigBuilder {
             }
         }
         println!("Implement load method");
+
+        // TODO: Implement load method
         Ok(Self::default())
     }
 
-    fn is_default(&self) -> Result<bool> {
-        match self.load() {
-            Ok(loaded_config) => {
-                if Self::default() == loaded_config {
-                    Ok(true)
-                } else {
-                    Ok(false)
-                }
-            }
-            Err(_) => Ok(false),
-        }
-    }
+    // fn is_default(&self) -> Result<bool> {
+    //     match self.load() {
+    //         Ok(loaded_config) => {
+    //             if Self::default() == loaded_config {
+    //                 Ok(true)
+    //             } else {
+    //                 Ok(false)
+    //             }
+    //         }
+    //         Err(_) => Ok(false),
+    //     }
+    // }
 }
 
 impl<T: PersistentConfigBuilder> PersistentConfig for T {}
