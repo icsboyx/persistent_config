@@ -1,36 +1,52 @@
-use persistent_config::persistent_config_macros::Persistent;
-use persistent_config::{PersistentConfig, PersistentConfigBuilder, SaveFormat};
+use persistent_config::prelude::*;
 use serde::{Deserialize, Serialize}; // Import procedural macros
 
-#[derive(Serialize, Deserialize, Default, Debug, Persistent)] // Add configuration for Persistent derive
+#[derive(Serialize, Deserialize, Debug, Persistent)] // Add configuration for Persistent derive
+#[persistent(panic_on_error = false, bla = true)]
 pub struct MyConfig {
     pub field1: String,
     pub field2: i32,
 }
 
+// Impl custom default for the example configuration
+impl Default for MyConfig {
+    fn default() -> Self {
+        Self {
+            field1: "DEFAULT: Hello From Derive Example".to_string(),
+            field2: 69,
+        }
+    }
+}
+
 fn main() {
+    let mut my_config = MyConfig::default();
+
+    // Set the configuration
+    // Default config:
+    //      file_name, is the name of the struct type.
+    //      save_format, is toml.
+    //      panic_on_error, is true.
+    //
+    my_config.default_save_config(false).unwrap();
+
+    my_config.load().unwrap();
+
+    println!("{:=^100}", "Loaded Values");
+    println!("Struct value: {:?}", my_config);
+
     let my_config = MyConfig {
         field1: "Hello From Derive Example".to_string(),
         field2: 42,
     };
 
-    // Create configuration with the persistent config library
-    my_config
-        .permanent_config(None, None, SaveFormat::default(), true)
-        .unwrap();
+    // println!("{:=^100}", " Checking configuration ");
+    // // println!(
+    // //     "Check if loaded config is equal to default {}",
+    // //     my_config.is_default().unwrap()
+    // // );
 
-    // Load the configuration
-    println!("{:=^100}", " Saving configuration ");
-    my_config.load().unwrap();
-
-    println!("{:=^100}", " Checking configuration ");
-    // println!(
-    //     "Check if loaded config is equal to default {}",
-    //     my_config.is_default().unwrap()
-    // );
-
-    println!("{:=^100}", " Configuration content ");
-    println!("Content of the : {:#?}", my_config);
+    // println!("{:=^100}", " Configuration content ");
+    // println!("Content of the : {:#?}", my_config);
 
     // Save the configuration
     println!("{:=^100}", " Updating configuration ");

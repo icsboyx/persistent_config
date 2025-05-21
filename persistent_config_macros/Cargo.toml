@@ -7,6 +7,7 @@ edition = "2024"
 proc-macro = true
 
 [dependencies]
+persistent_config_core = { path = "../persistent_config_core" }
 syn = { version = "2", features = ["full", "extra-traits"] }
 quote = "1"
 proc-macro2 = "1"

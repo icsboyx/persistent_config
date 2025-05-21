@@ -1,0 +1,11 @@
+[lib]
+proc-macro = false
+
+
+[package]
+name = "persistent_config_core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"

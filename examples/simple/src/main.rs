@@ -1,4 +1,4 @@
-use persistent_config::{PersistentConfig, PersistentConfigBuilder, SaveFormat};
+use persistent_config::{PersistentConfig, PersistentConfigBuilder};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
@@ -10,15 +10,13 @@ struct MyConfig {
 impl PersistentConfigBuilder for MyConfig {}
 
 fn main() {
-    let my_config = MyConfig {
-        field1: "Hello From Simple ipml Example".to_string(),
+    let mut my_config = MyConfig {
+        field1: "Hello From Simple impl Example".to_string(),
         field2: 42,
     };
 
     // Create configuration with the persistent config library
-    my_config
-        .permanent_config(None, None, SaveFormat::default(), true)
-        .unwrap();
+    my_config.default_save_config(false).unwrap();
 
     // Load the configuration
     println!("{:=^100}", " Saving configuration ");

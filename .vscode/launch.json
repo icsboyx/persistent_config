@@ -1,0 +1,120 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'derive'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=derive",
+                    "--package=derive"
+                ],
+                "filter": {
+                    "name": "derive",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'derive'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=derive",
+                    "--package=derive"
+                ],
+                "filter": {
+                    "name": "derive",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'persistent_config'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=persistent_config"
+                ],
+                "filter": {
+                    "name": "persistent_config",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'persistent_config_core'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=persistent_config_core"
+                ],
+                "filter": {
+                    "name": "persistent_config_core",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'simple'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=simple",
+                    "--package=simple"
+                ],
+                "filter": {
+                    "name": "simple",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'simple'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=simple",
+                    "--package=simple"
+                ],
+                "filter": {
+                    "name": "simple",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

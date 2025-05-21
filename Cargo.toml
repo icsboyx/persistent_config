@@ -1,4 +1,10 @@
 [workspace]
-members = [ "examples/derive", "examples/simple", "examples/workspace","persistent_config", "persistent_config_macros"]
+members = [
+    "examples/derive",
+    "examples/simple",
+    "persistent_config_core",
+    "persistent_config",
+    "persistent_config_macros",
+]
 
 resolver = "3"
