@@ -74,9 +74,12 @@ dependencies = [
 name = "persistent_config_macros"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "persistent_config_core",
  "proc-macro2",
  "quote",
+ "serde",
+ "serde_json",
  "syn",
 ]
 

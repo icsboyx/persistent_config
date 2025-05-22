@@ -2,7 +2,7 @@ use persistent_config::prelude::*;
 use serde::{Deserialize, Serialize}; // Import procedural macros
 
 #[derive(Serialize, Deserialize, Debug, Persistent)] // Add configuration for Persistent derive
-#[persistent(panic_on_error = false, bla = true)]
+#[persistent(panic_on_error = false, non_serve = true)]
 pub struct MyConfig {
     pub field1: String,
     pub field2: i32,
@@ -19,6 +19,7 @@ impl Default for MyConfig {
 }
 
 fn main() {
+    println!("{:=^100}", "Running Derive Example");
     let mut my_config = MyConfig::default();
 
     // Set the configuration
@@ -27,7 +28,7 @@ fn main() {
     //      save_format, is toml.
     //      panic_on_error, is true.
     //
-    my_config.default_save_config(false).unwrap();
+    // my_config.default_save_config(false).unwrap();
 
     my_config.load().unwrap();
 

@@ -1,6 +1,12 @@
-use proc_macro::{TokenStream, TokenTree};
+use std::iter;
+
+use anyhow::bail;
+use persistent_config_core::PersistentConfigParameters;
+use proc_macro::{TokenStream, TokenTree, token_stream};
 use quote::{ToTokens, quote};
-use syn::{DeriveInput, parse_macro_input};
+use serde::Serialize;
+use serde_json::Value;
+use syn::{DeriveInput, Meta, parse_macro_input};
 
 #[proc_macro_derive(Persistent, attributes(persistent))]
 pub fn derive(input: TokenStream) -> TokenStream {
@@ -9,14 +15,27 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let generics = input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     let attributes = input.attrs;
-    // println!("Attributes: {:#?}", attributes);
 
     for attribute in attributes {
         if attribute.path().is_ident("persistent") {
-            let token_stream = attribute.to_token_stream();
-            // println!("Token {:#?}", token_stream);
+            if let Some(path_ident) = attribute.meta.path().get_ident() {
+                println!("**************\n {:#?}", attribute.meta.to_token_stream().iter);
+                // let mut ret_val = TokenStream::new();
+                // attribute.meta.to_tokens(&mut ret_val.into());
 
-            println!("TokenStream {:#?}", parse_key_value_args(token_stream.into()));
+                // for val in ret_val {
+                //     match val {
+                //         TokenTree::Group(group) => {}
+                //         TokenTree::Ident(ident) => {}
+                //         TokenTree::Punct(punct) => {}
+                //         TokenTree::Literal(literal) => {}
+                //     }
+                // }
+                if path_ident.to_string() == "persistent".to_string() {
+                    // let ret_val = parse_key_value_args(attribute.meta);
+                    // println!("{:#?}", ret_val);
+                }
+            }
         }
     }
     let expanded = quote! {
@@ -27,16 +46,20 @@ pub fn derive(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
-fn parse_key_value_args(tokens: TokenStream) -> Vec<(String, String)> {
+fn parse_key_value_args(tokens: TokenStream) -> PersistentConfigParameters {
     let mut key_values = vec![];
     let mut key = String::new();
     let mut ready_for_value = false;
 
+    println!("{:#?}", tokens);
+
+    let valid_parameters = ["config_dir", "file_name", "save_format", "panic_on_error"];
+
+    let mut persistent_config_parameters = PersistentConfigParameters::default();
+
     for token in tokens {
         match token {
             TokenTree::Punct(punct) => {
-                println!("{:#^100}", "");
-                println!("Punct: {:#?}", punct);
                 if !key.is_empty() && punct.to_string() == "=" {
                     ready_for_value = true;
                     continue;
@@ -44,28 +67,26 @@ fn parse_key_value_args(tokens: TokenStream) -> Vec<(String, String)> {
                 key.clear();
             }
             TokenTree::Group(group) => {
-                // println!("{:#^100}", "");
-                // println!("Group: {:#?}", group);
-                parse_key_value_args(group.stream());
+                persistent_config_parameters = parse_key_value_args(group.stream());
             }
             TokenTree::Ident(ident) => {
-                println!("{:#^100}", "");
-                println!("Ident: {:#?}", ident);
                 if ready_for_value {
                     key_values.push((key.clone(), ident.to_string()));
                     key.clear();
                     ready_for_value = false;
                     continue;
                 }
-                key = ident.to_string();
+                match ident.to_string() {
+                    val if valid_parameters.contains(&val.as_str()) => {
+                        key = val;
+                    }
+                    _ => {}
+                };
             }
 
-            TokenTree::Literal(literal) => {
-                println!("{:#^100}", "");
-                println!("Literal: {:#?}", literal);
-            }
+            TokenTree::Literal(_) => {}
         };
     }
 
-    key_values
+    persistent_config_parameters
 }
