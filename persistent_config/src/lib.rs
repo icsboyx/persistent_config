@@ -4,10 +4,11 @@ use std::io::{Write, read_to_string};
 use std::path::PathBuf;
 
 pub use anyhow::{Error, Result};
-use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters, SaveFormat};
+pub use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters, SaveFormat};
 use serde::{Deserialize, Serialize};
 
 pub mod prelude {
+    pub use persistent_config_core::*;
     #[cfg(feature = "derive")]
     pub use persistent_config_macros::Persistent;
 

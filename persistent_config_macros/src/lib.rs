@@ -1,57 +1,69 @@
-use std::iter;
-
-use anyhow::bail;
-use persistent_config_core::PersistentConfigParameters;
-use proc_macro::{TokenStream, TokenTree, token_stream};
-use quote::{ToTokens, quote};
-use serde::Serialize;
-use serde_json::Value;
-use syn::{DeriveInput, Meta, parse_macro_input};
+use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters, SaveFormat};
+use proc_macro::token_stream;
+use proc_macro2::{TokenStream, TokenTree};
+use quote::{ToTokens, TokenStreamExt, quote};
+use syn::{DeriveInput, parse_macro_input};
 
 #[proc_macro_derive(Persistent, attributes(persistent))]
-pub fn derive(input: TokenStream) -> TokenStream {
+pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = input.ident;
     let generics = input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     let attributes = input.attrs;
+    let mut persistent_config = PersistentConfigParameters::default();
 
     for attribute in attributes {
         if attribute.path().is_ident("persistent") {
-            if let Some(path_ident) = attribute.meta.path().get_ident() {
-                println!("**************\n {:#?}", attribute.meta.to_token_stream().iter);
-                // let mut ret_val = TokenStream::new();
-                // attribute.meta.to_tokens(&mut ret_val.into());
-
-                // for val in ret_val {
-                //     match val {
-                //         TokenTree::Group(group) => {}
-                //         TokenTree::Ident(ident) => {}
-                //         TokenTree::Punct(punct) => {}
-                //         TokenTree::Literal(literal) => {}
-                //     }
-                // }
-                if path_ident.to_string() == "persistent".to_string() {
-                    // let ret_val = parse_key_value_args(attribute.meta);
-                    // println!("{:#?}", ret_val);
+            let mut ret_val = proc_macro2::TokenStream::new();
+            attribute.meta.to_tokens(&mut ret_val);
+            for val in ret_val {
+                match val {
+                    proc_macro2::TokenTree::Group(group) => {
+                        persistent_config.merge_from(parse_key_value_args(group.stream()));
+                        println!("############\n{:?}", persistent_config);
+                    }
+                    _ => {}
                 }
             }
         }
     }
+
+    let config_dir = persistent_config.config_dir;
+    let file_name = persistent_config.file_name;
+    let panic_on_error = persistent_config.panic_on_error;
+    let save_format = match persistent_config.save_format {
+        SaveFormat::JSON => quote! { persistent_config::SaveFormat::JSON },
+        SaveFormat::TOML => quote! { persistent_config::SaveFormat::TOML },
+        SaveFormat::YAML => quote! { persistent_config::SaveFormat::YAML },
+    };
+
     let expanded = quote! {
         impl #impl_generics persistent_config::PersistentConfigBuilder for #name #ty_generics #where_clause {}
 
+        // const _: () = {
+        //     let config = persistent_config::PersistentConfigParameters {
+        //         config_dir: #config_dir,
+        //         file_name: #file_name,
+        //         save_format: #save_format,
+        //         panic_on_error: #panic_on_error,
+        //     };
+        //     persistent_config::PERSISTENT_CONFIGS
+        //         .write()1
+        //         .unwrap()
+        //         .add_config::<#name>(config);
+        // };
     };
 
-    TokenStream::from(expanded)
+    println!("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n{}", expanded.to_string());
+
+    TokenStream::from(expanded).into()
 }
 
 fn parse_key_value_args(tokens: TokenStream) -> PersistentConfigParameters {
     let mut key_values = vec![];
     let mut key = String::new();
     let mut ready_for_value = false;
-
-    println!("{:#?}", tokens);
 
     let valid_parameters = ["config_dir", "file_name", "save_format", "panic_on_error"];
 
@@ -70,12 +82,6 @@ fn parse_key_value_args(tokens: TokenStream) -> PersistentConfigParameters {
                 persistent_config_parameters = parse_key_value_args(group.stream());
             }
             TokenTree::Ident(ident) => {
-                if ready_for_value {
-                    key_values.push((key.clone(), ident.to_string()));
-                    key.clear();
-                    ready_for_value = false;
-                    continue;
-                }
                 match ident.to_string() {
                     val if valid_parameters.contains(&val.as_str()) => {
                         key = val;
@@ -84,8 +90,39 @@ fn parse_key_value_args(tokens: TokenStream) -> PersistentConfigParameters {
                 };
             }
 
-            TokenTree::Literal(_) => {}
+            TokenTree::Literal(lit) => {
+                if ready_for_value {
+                    let val = lit.to_string();
+                    key_values.push((key.clone(), val.trim_matches('"').to_string()));
+                    key.clear();
+                    ready_for_value = false;
+                    continue;
+                }
+            }
         };
+    }
+
+    for (key, val) in key_values {
+        match key.as_str() {
+            "panic_on_error" => {
+                persistent_config_parameters.panic_on_error = val
+                    .parse::<bool>()
+                    .unwrap_or_else(|e| panic!("Failed to parse panic_on_error: {}. Error: {}", val, e));
+            }
+            "file_name" => {
+                persistent_config_parameters.file_name = val;
+            }
+            "config_dir" => {
+                persistent_config_parameters.config_dir = val;
+            }
+            "save_format" => {
+                persistent_config_parameters.save_format = val.try_into().unwrap();
+            }
+
+            _ => {
+                println!("Unknown parameter: {}", key);
+            }
+        }
     }
 
     persistent_config_parameters

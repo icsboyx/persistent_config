@@ -68,6 +68,8 @@ name = "persistent_config_core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
