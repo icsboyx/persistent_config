@@ -1,13 +1,14 @@
-use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters, SaveFormat};
+use persistent_config_core::{self, PersistentConfigParameters, ctor};
 use proc_macro::token_stream;
 use proc_macro2::{TokenStream, TokenTree};
-use quote::{ToTokens, TokenStreamExt, quote};
+use quote::{ToTokens, TokenStreamExt, format_ident, quote};
 use syn::{DeriveInput, parse_macro_input};
 
 #[proc_macro_derive(Persistent, attributes(persistent))]
 pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = input.ident;
+
     let generics = input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     let attributes = input.attrs;
@@ -29,30 +30,28 @@ pub fn derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         }
     }
 
-    let config_dir = persistent_config.config_dir;
-    let file_name = persistent_config.file_name;
-    let panic_on_error = persistent_config.panic_on_error;
-    let save_format = match persistent_config.save_format {
-        SaveFormat::JSON => quote! { persistent_config::SaveFormat::JSON },
-        SaveFormat::TOML => quote! { persistent_config::SaveFormat::TOML },
-        SaveFormat::YAML => quote! { persistent_config::SaveFormat::YAML },
-    };
+    let config_dir = persistent_config.config_dir.clone();
+    let file_name = persistent_config.file_name.clone();
+    let save_format = persistent_config.save_format.clone();
+    let panic_on_error = persistent_config.panic_on_error.clone();
 
+    let register_fn = format_ident!("__register_config_for_{}", name);
     let expanded = quote! {
         impl #impl_generics persistent_config::PersistentConfigBuilder for #name #ty_generics #where_clause {}
 
-        // const _: () = {
-        //     let config = persistent_config::PersistentConfigParameters {
-        //         config_dir: #config_dir,
-        //         file_name: #file_name,
-        //         save_format: #save_format,
-        //         panic_on_error: #panic_on_error,
-        //     };
-        //     persistent_config::PERSISTENT_CONFIGS
-        //         .write()1
-        //         .unwrap()
-        //         .add_config::<#name>(config);
-        // };
+        #[persistent_config_core::ctor::ctor]
+        fn #register_fn() {
+            let config = persistent_config::PersistentConfigParameters {
+                config_dir: #config_dir.to_string(),
+                file_name: #file_name.to_string(),
+                save_format: persistent_config::SaveFormat::try_from(#save_format).unwrap_or(persistent_config::SaveFormat::default()),
+                panic_on_error: #panic_on_error,
+            };
+            persistent_config::PERSISTENT_CONFIGS
+                .write()
+                .unwrap()
+                .add_config::<#name>(config);
+        }
     };
 
     println!("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n{}", expanded.to_string());

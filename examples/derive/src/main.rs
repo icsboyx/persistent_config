@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize}; // Import procedural macros
 
 #[derive(Serialize, Deserialize, Debug, Persistent)]
 #[persistent(
-    panic_on_error = "true",
+    panic_on_error = "false",
     file_name = "custom_patata",
-    config_dir = "/temp",
+    config_dir = "conf/",
     save_format = "yaml"
 )]
 pub struct MyConfig {

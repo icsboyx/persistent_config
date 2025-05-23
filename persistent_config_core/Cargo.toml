@@ -8,6 +8,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+ctor = "0.4"
 anyhow = "1.0.98"
 quote = "1"
 proc-macro2 = "1"

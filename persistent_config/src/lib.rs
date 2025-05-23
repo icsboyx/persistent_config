@@ -8,7 +8,7 @@ pub use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters,
 use serde::{Deserialize, Serialize};
 
 pub mod prelude {
-    pub use persistent_config_core::*;
+    pub use persistent_config_core::{ctor, *};
     #[cfg(feature = "derive")]
     pub use persistent_config_macros::Persistent;
 
@@ -194,7 +194,7 @@ pub trait PersistentConfig: PersistentConfigBuilder {
             }
             Err(e) if !params.panic_on_error => {
                 println!("Error loading file: {:?}", e);
-                println!("Ephimeral mode seleted, Returning default configuration, Attention values may be lost");
+                println!("Ephemeral mode selected, Returning default configuration, Attention values may be lost");
                 *self = Self::default();
                 return Ok(());
             }

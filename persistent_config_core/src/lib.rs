@@ -4,6 +4,7 @@ use std::fmt::Debug;
 use std::sync::{LazyLock, RwLock};
 
 pub use anyhow::{Error, Result};
+pub use ctor;
 use quote::ToTokens;
 
 pub static PERSISTENT_CONFIGS: LazyLock<RwLock<PersistentConfigDB>> =
@@ -44,6 +45,19 @@ impl TryFrom<String> for SaveFormat {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         match value.as_str() {
+            "json" => Ok(SaveFormat::JSON),
+            "toml" => Ok(SaveFormat::TOML),
+            "yaml" => Ok(SaveFormat::YAML),
+            _ => Err("Unsupported format: use 'json', 'toml', or 'yaml'"),
+        }
+    }
+}
+
+impl TryFrom<&'_ str> for SaveFormat {
+    type Error = &'static str;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
             "json" => Ok(SaveFormat::JSON),
             "toml" => Ok(SaveFormat::TOML),
             "yaml" => Ok(SaveFormat::YAML),
