@@ -1,0 +1,31 @@
+
+[lib]
+proc-macro = false
+
+[package]
+name = "persistent_config"
+version = "0.1.0"
+edition = "2024"
+authors = ["icsboyx"]
+description = "persistent_config is a Rust crate for simple, type-safe, and ergonomic persistent configuration management. It allows you to easily save and load your application's configuration structs to disk using familiar serialization formats (like TOML, JSON, etc.)"
+categories = ["filesystem", "data-structures"]
+repository = "https://github.com/icsboyx/persistent_config/tree/master/persistent_config"
+license = "MIT"
+keywords = ["persistent_config", "filesystem", "persistent", "save", "data"]
+
+
+[dependencies]
+
+persistent_config_macros = { path = "../persistent_config_macros", optional = true, version = "0.1" }
+persistent_config_core = { path = "../persistent_config_core", optional = false, version = "0.1" }
+
+anyhow = "1.0.98"
+serde_json = "1.0.140"
+toml = "0.8.22"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_yaml = "0.9.34"
+
+
+[features]
+default = []                              # This is the default set of features
+derive = ["dep:persistent_config_macros"]

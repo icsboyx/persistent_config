@@ -1,0 +1,20 @@
+[package]
+name = "persistent_config_macros"
+version = "0.1.0"
+edition = "2024"
+authors = ["icsboyx"]
+description = "This is the persistent_config macros crate, which provides procedural macros for the persistent_config crate."
+categories = ["filesystem", "data-structures"]
+repository = "https://github.com/icsboyx/persistent_config/tree/master/persistent_config_macros"
+license = "MIT"
+keywords = ["persistent_config", "filesystem", "persistent", "save", "data"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+persistent_config_core = { path = "../persistent_config_core", version = "0.1" }
+syn = { version = "2", features = ["full", "extra-traits"] }
+quote = "1"
+proc-macro2 = "1"
+anyhow = "1.0.98"

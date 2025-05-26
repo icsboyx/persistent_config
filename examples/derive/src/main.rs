@@ -1,0 +1,48 @@
+//! Example: Using the `Persistent` derive macro for configuration persistence.
+//!
+//! This example demonstrates how to use the `Persistent` derive macro to
+//! automatically implement persistent save/load functionality for a config struct.
+//!
+//! Run with: `cargo run --example simple`
+
+use persistent_config::prelude::*;
+use serde::{Deserialize, Serialize};
+
+/// Application configuration with persistent storage.
+///
+/// The `Persistent` derive macro automatically implements the necessary traits
+/// for saving and loading this struct to disk.
+#[derive(Debug, Serialize, Deserialize, Default, Persistent)]
+struct AppConfig {
+    /// Username for the application.
+    username: String,
+    /// Number of times the app has been launched.
+    launch_count: u32,
+}
+
+fn main() -> anyhow::Result<()> {
+    // Create a default config and register it for persistence.
+    let config = AppConfig {
+        username: "alice".to_string(),
+        launch_count: 1,
+    };
+
+    // Register config with default parameters (TOML, current dir, type name as file).
+    config.default_save_config(false)?;
+
+    // Save the configuration to disk.
+    config.save()?;
+    println!("Configuration saved: {:?}", config);
+
+    // Simulate a new session by resetting the struct.
+    let mut loaded_config = AppConfig::default();
+
+    // Register config for loading (must match previous registration).
+    loaded_config.default_save_config(false)?;
+
+    // Load the configuration from disk.
+    loaded_config.load()?;
+    println!("Configuration loaded: {:?}", loaded_config);
+
+    Ok(())
+}

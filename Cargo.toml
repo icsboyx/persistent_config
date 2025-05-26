@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "examples/derive",
+    "examples/simple",
+    "examples/cooking_recipes",
+    "persistent_config_core",
+    "persistent_config",
+    "persistent_config_macros",
+]
+
+resolver = "3"

@@ -1,0 +1,10 @@
+[package]
+name = "derive"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"
+persistent_config = { path = "../../persistent_config", features = ["derive"] }
+persistent_config_core = { path = "../../persistent_config_core" }
+serde = { version = "1.0.219", features = ["derive"] }

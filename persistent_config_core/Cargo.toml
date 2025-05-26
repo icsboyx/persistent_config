@@ -1,0 +1,17 @@
+[lib]
+proc-macro = false
+
+
+[package]
+name = "persistent_config_core"
+version = "0.1.0"
+edition = "2024"
+authors = ["icsboyx"]
+description = "persistent_config crate Core"
+categories = ["filesystem", "data-structures"]
+repository = "https://github.com/icsboyx/persistent_config/tree/master/persistent_config_core"
+license = "MIT"
+keywords = ["persistent_config", "filesystem", "persistent", "save", "data"]
+
+[dependencies]
+anyhow = "1.0.98"

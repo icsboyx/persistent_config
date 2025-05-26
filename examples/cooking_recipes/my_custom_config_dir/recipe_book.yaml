@@ -1,0 +1,16 @@
+recipes:
+- name: Pancakes
+  ingredients:
+  - 2 cups flour
+  - 2 eggs
+  - 1.5 cups milk
+  - 1 tbsp sugar
+  - 1 tsp baking powder
+  instructions: Mix all ingredients and cook on a hot griddle.
+- name: Scrambled Eggs
+  ingredients:
+  - 3 eggs
+  - 1 tbsp butter
+  - Salt
+  - Pepper
+  instructions: Beat eggs, melt butter in pan, cook eggs while stirring.
