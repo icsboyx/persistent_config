@@ -134,11 +134,3 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 ```
-
-## Example: Cooking Recipes
-See [`examples/`](examples/) for a more complex example with a recipe book.
-
-## Features
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

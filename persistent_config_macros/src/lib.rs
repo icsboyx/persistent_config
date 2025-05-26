@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 //! # persistent_config_macros
 //!
 //! This crate provides the `Persistent` derive macro for the

@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 //! Persistent configuration trait and helpers.
 //!
 //! This module provides traits and helpers for saving and loading configuration
@@ -10,8 +12,8 @@ use std::fs::{File, OpenOptions};
 use std::io::{Write, read_to_string};
 use std::path::PathBuf;
 
-pub use anyhow::{Error, Result};
-pub use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters, SaveFormat};
+use anyhow::Result;
+use persistent_config_core::{PERSISTENT_CONFIGS, PersistentConfigParameters, SaveFormat};
 use serde::{Deserialize, Serialize};
 
 /// Prelude for convenient imports.

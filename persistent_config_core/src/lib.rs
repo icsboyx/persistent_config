@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 //! Core types and utilities for persistent configuration management.
 //!
 //! This module provides the [`PersistentConfigDB`] for storing configuration parameters
@@ -9,7 +11,7 @@ use std::fmt::Debug;
 use std::sync::{LazyLock, RwLock};
 
 /// Re-exported error and result types from `anyhow`.
-pub use anyhow::{Error, Result};
+use anyhow::Result;
 
 /// Global static database for persistent configuration parameters.
 pub static PERSISTENT_CONFIGS: LazyLock<PersistentConfigDB> = LazyLock::new(|| PersistentConfigDB::default());
