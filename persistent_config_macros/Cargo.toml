@@ -1,6 +1,6 @@
 [package]
 name = "persistent_config_macros"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 authors = ["icsboyx"]
 description = "This is the persistent_config macros crate, which provides procedural macros for the persistent_config crate."
