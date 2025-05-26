@@ -4,7 +4,7 @@ proc-macro = false
 
 [package]
 name = "persistent_config"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["icsboyx"]
 description = "persistent_config is a Rust crate for simple, type-safe, and ergonomic persistent configuration management. It allows you to easily save and load your application's configuration structs to disk using familiar serialization formats (like TOML, JSON, etc.)"
